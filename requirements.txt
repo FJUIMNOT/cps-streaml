@@ -5,7 +5,4 @@ pydeck
 streamlit
 plotly
 xlsxwriter
-
 scipy
-
-

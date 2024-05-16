@@ -5,8 +5,5 @@ pydeck
 streamlit
 plotly
 xlsxwriter
-ByteIO
 scipy
-operator
-itertools
 

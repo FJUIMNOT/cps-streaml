@@ -17,7 +17,6 @@ import linecache
 
 def excel_write_col(worksheet,row,col, data):
     print(len(data))
-
     for row_count in range (row,len(data)+row):
         worksheet.write(row_count,col,data[row_count-row])
 
@@ -25,41 +24,61 @@ def save_raw_excel(result_5, result_079, data,comments_text):
     output = BytesIO()
     workbook = xlsxwriter.Workbook(output, {'in_memory': True})
     bold = workbook.add_format({'bold': 1})
-    title1_format = workbook.add_format({'bold': True, 
+    title1_format = workbook.add_format({'bold': False, 
                                          'font_color':'black',
+                                         'font_size' : '8.5',
+                                         'font_name' : 'Arial',
                                          'bg_color': '#8EA9DB',
                                          'center_across': 'True', 
                                          'border': 1 })
     title2_format = workbook.add_format({'bold': False,
                                          'bg_color': '#E2EFDA',
+                                         'font_size' : '8.5',
+                                         'font_name' : 'Arial',
                                          'num_format' : '#,##0.0',
                                          'center_across': True,
                                          'border': 1 })
-    title3_format = workbook.add_format({'bold': True, 
-                                         'font_color':'black', 
+    title3_format = workbook.add_format({'bold': False, 
+                                         'font_color':'black',
+                                         'font_size' : '8.5',
+                                         'font_name' : 'Arial',
                                          'center_across': 'True', 
                                          'border': 1, 
                                          'align' : 'vcenter' })
     title4_format = workbook.add_format({'bold': False,
                                          'bg_color': '#E2EFDA',
+                                         'font_size' : '8.5',
+                                         'font_name' : 'Arial',
                                          'num_format' : '#,##0.0',  
                                          'border': 1 })
     title5_format = workbook.add_format({'bold': False,
                                          'bg_color': '#F6F8F3',
                                          'num_format' : '#,##0.0',
+                                         'font_size' : '8.5',
+                                         'font_name' : 'Arial',
                                          'center_across': True,
                                          'border': 1 })
     title6_format = workbook.add_format({'bold': False,
                                          'bg_color': '#F6F8F3',
+                                         'font_size' : '8.5',
+                                         'font_name' : 'Arial',
                                          'num_format' : '#,##0.0',
                                          'border': 1 })
-
+    title7_format = workbook.add_format({'bold': False,
+                                         'bg_color': '#E2EFDA',
+                                         'font_size' : '8.5',
+                                         'font_name' : 'Arial',
+                                         'num_format' : '#,##0.0',
+                                         'center_across': True})
     # Worksheet result
     worksheet_1 = workbook.add_worksheet('Results')
     row = 1 #row counter for tab 1
     col = 0 #col counter for tab 1
     row_i =3 # initial row for tabs
     col_i =6 # initial col for tabs
+    col_chart1 = 10
+    col_chart2 = 19
+    col_chart3 = 1  
 
     worksheet_1.write(0,0,"Comments", title1_format)
     worksheet_1.write(0,1,comments_text)
@@ -81,72 +100,117 @@ def save_raw_excel(result_5, result_079, data,comments_text):
         worksheet_1.write_row(row_i + row, col_i , result_079.loc[index], title5_format)
         row += 1
     worksheet_1.merge_range(row_i + row_b , col_i-5 , row_i + row - 1, col_i-4  , "Result 0.79 microns", title3_format)
-    row_data = row + 25 # Row to start data table in tab 1
+    row_data = row + 48 # Row to start data table in tab 1
     chart1 = workbook.add_chart({'type': 'scatter', 'subtype': 'smooth'})
     chart2 = workbook.add_chart({'type': 'scatter', 'subtype': 'smooth'})
     chart3 = workbook.add_chart({'type': 'scatter', 'subtype': 'smooth'})
+    chart4 = workbook.add_chart({'type': 'scatter', 'subtype': 'smooth'})
+    chart5 = workbook.add_chart({'type': 'scatter', 'subtype': 'smooth'})
+    chart6 = workbook.add_chart({'type': 'scatter', 'subtype': 'smooth'})
 
     # Worksheet result
     mydict = {}
     series = {}
-    col_d = col_i
+    col_d = col_i - 5
     for sample in data :
         name = sample['name']
         data_sample = sample['data']
 
         #Write subset of data in first  tab
         len_data = len(data_sample["Diameter"].values.tolist())
-        worksheet_1.write(row_data -2  ,col_d , name ,title1_format)
-        worksheet_1.write(row_data -1  ,col_d , "Diameter",title1_format)
-        worksheet_1.write(row_data -1  ,col_d +1 , "Weight_Height_norm",title1_format)
-        worksheet_1.write(row_data -1  ,col_d + 2 , "Weight_LogW_norm",title1_format)
-        worksheet_1.write(row_data -1  ,col_d + 3 , "Weight_CumWt_norm",title1_format)
+        worksheet_1.merge_range(row_data -2  ,col_d, row_data -2  ,col_d+3, name, title3_format)
+        #worksheet_1.write(row_data -2  ,col_d , name ,title1_format)
+        worksheet_1.write(row_data -1  ,col_d , "Diameter",title2_format)
+        worksheet_1.write(row_data -1  ,col_d +1 , "Weight_Height_norm",title2_format)
+        worksheet_1.write(row_data -1  ,col_d + 2 , "Weight_LogW_norm",title2_format)
+        worksheet_1.write(row_data -1  ,col_d + 3 , "Weight_CumWt_norm",title2_format)
         excel_write_col(worksheet_1, row_data,col_d, data_sample["Diameter"].values.tolist())
         excel_write_col(worksheet_1, row_data,col_d + 1, data_sample["Weight_Height_norm"].values.tolist())
         excel_write_col(worksheet_1, row_data,col_d + 2, data_sample["Weight_LogW_norm"].values.tolist())
         excel_write_col(worksheet_1, row_data,col_d + 3, data_sample["Weight_CumWt_norm"].values.tolist())
+
+        row_79 = row_i + 1
+        i = 0 
+        for r in data_sample["Diameter"] : 
+            if r > 790 : 
+                i += 1
+            else : 
+                row_79 = i + row_79
+                
+                break
+
 
         # Add series to plots
         diam_cat = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i)}${row_i+1}:${xlsxwriter.utility.xl_col_to_name(col_i)}${len_data}"
         WH_val = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+1)}${row_i+1}:${xlsxwriter.utility.xl_col_to_name(col_i+1)}${len_data}"
         WLW_val = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+2)}${row_i+1}:${xlsxwriter.utility.xl_col_to_name(col_i+2)}${len_data}"
         WCW_val = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+3)}${row_i+1}:${xlsxwriter.utility.xl_col_to_name(col_i+3)}${len_data}"
-        chart1.add_series({'name': name,'categories':diam_cat ,'values': WH_val,})
-        chart2.add_series({'name': name,'categories':diam_cat ,'values': WLW_val,})
-        chart3.add_series({'name': name,'categories':diam_cat ,'values': WCW_val,})
+        diam_cat_79 = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i)}${row_79}:${xlsxwriter.utility.xl_col_to_name(col_i)}${len_data}"
+        WH_val_79 = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+1)}${row_79}:${xlsxwriter.utility.xl_col_to_name(col_i+1)}${len_data}"
+        WLW_val_79 = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+2)}${row_79}:${xlsxwriter.utility.xl_col_to_name(col_i+2)}${len_data}"
+        WCW_val_79 = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+3)}${row_79}:${xlsxwriter.utility.xl_col_to_name(col_i+3)}${len_data}"
+        chart1.add_series({'name': name,'categories':diam_cat ,'values': WH_val,'line': {'width': 1.25}})
+        chart2.add_series({'name': name,'categories':diam_cat ,'values': WLW_val, 'line': {'width': 1.25}})
+        chart3.add_series({'name': name,'categories':diam_cat ,'values': WCW_val, 'line': {'width': 1.25}})
+        chart4.add_series({'name': name,'categories':diam_cat_79 ,'values': WH_val_79,'line': {'width': 1.25}})
+        chart5.add_series({'name': name,'categories':diam_cat_79 ,'values': WLW_val_79, 'line': {'width': 1.25}})
+        chart6.add_series({'name': name,'categories':diam_cat_79 ,'values': WCW_val_79, 'line': {'width': 1.25}})
 
         #Write data, one dataset by tab
         mydict[f"worksheet_{name}"] =  workbook.add_worksheet(name)
         col_tabs =0 # col counter for additional tabs
         for df_col in list(data_sample) :
-            mydict[f"worksheet_{name}"].write(row_i-1,col_i + col_tabs,df_col, title2_format)
+            mydict[f"worksheet_{name}"].write(row_i-1,col_i + col_tabs,df_col, title7_format)
             mydict[f"worksheet_{name}"].write_column(row_i,col_i + col_tabs,data_sample[df_col])
+            mydict[f"worksheet_{name}"].autofit()
             col_tabs+=1
-        col_d +=4
+        col_d +=5
+    row +=1
 
     # Add a chart title and some axis labels.
-    chart1.set_title ({'name': 'Weight Height Distribution'})
-    chart1.set_x_axis({'name': 'Diameter  [microns]','log_base': 10,  'min':10 ,  'major_gridlines': {'visible': True,'line': {'width': 0.6}}, 'minor_gridlines': {'visible': True,'line': {'width': 0.07}}})
-    chart1.set_y_axis({'name': 'Normalized counts', 'min' : 0, 'max' : 100})
-    chart1.set_legend({'position': 'bottom'})
-    chart1.set_size({'width': 520, 'height': 376})
+    chart1.set_title ({'name': 'Weight Height Distribution', 'name_font':  {'name': 'calibri (corps)', 'size': 13}})
+    chart1.set_x_axis({'name': 'Diameter  (nm)','name_font':  {'name': 'calibri (corps)', 'size': 10,'bold': False}, 'num_font' : {'name' : 'calibri (corps)', 'size' : 9}, 'log_base': 10,  'min':10 ,  'major_gridlines': {'visible': True,'line': {'width': 0.6}}, 'minor_gridlines': {'visible': True,'line': {'width': 0.07}}})
+    chart1.set_y_axis({ 'min' : 0, 'max' : 100})
+    chart1.set_legend({'position': 'bottom', 'font' : {'size' : 9}})
+    chart1.set_size({'width': 550, 'height': 376})
 
-    chart2.set_title ({'name': 'LogW Distribution'})
-    chart2.set_x_axis({'name': 'Diameter  [microns]','log_base': 10,  'min':10 ,  'major_gridlines': {'visible': True,'line': {'width': 0.6}}, 'minor_gridlines': {'visible': True,'line': {'width': 0.07}}})
-    chart2.set_y_axis({'name': 'Normalized counts', 'min' : 0, 'max' : 100})
-    chart2.set_legend({'position': 'bottom'})
-    chart2.set_size({'width': 520, 'height': 376})
+    chart2.set_title ({'name': 'LogW Distribution', 'name_font':  {'name': 'calibri (corps)', 'size': 13}})
+    chart2.set_x_axis({'name': 'Diameter  (nm)','name_font':  {'name': 'calibri (corps)', 'size': 10,'bold': False},  'num_font' : {'name' : 'calibri (corps)', 'size' : 9}, 'log_base': 10,  'min':10 ,  'major_gridlines': {'visible': True,'line': {'width': 0.6}}, 'minor_gridlines': {'visible': True,'line': {'width': 0.07}}})
+    chart2.set_y_axis({'min' : 0, 'max' : 100 })
+    chart2.set_legend({'position': 'bottom', 'font' : {'size' : 9}})
+    chart2.set_size({'width': 550, 'height': 376})
 
-    chart3.set_title ({'name': 'Cumulative Weight Distribution'})
-    chart3.set_x_axis({'name': 'Diameter  [microns]','log_base': 10,  'min':10 ,  'major_gridlines': {'visible': True,'line': {'width': 0.6}}, 'minor_gridlines': {'visible': True,'line': {'width': 0.07}}})
-    chart3.set_y_axis({'name': 'Normalized counts', 'min' : 0, 'max' : 100})
-    chart3.set_legend({'position': 'bottom'})
-    chart3.set_size({'width': 520, 'height': 376})
+    chart3.set_title ({'name': 'Cumulative Weight Distribution', 'name_font':  {'name': 'calibri (corps)', 'size': 13}})
+    chart3.set_x_axis({'name': 'Diameter  (nm)','name_font':  {'name': 'calibri (corps)', 'size': 10,'bold': False},  'num_font' : {'name' : 'calibri (corps)', 'size' : 9}, 'log_base': 10,  'min':10 ,  'major_gridlines': {'visible': True,'line': {'width': 0.6}}, 'minor_gridlines': {'visible': True,'line': {'width': 0.07}}})
+    chart3.set_y_axis({'min' : 0, 'max' : 100})
+    chart3.set_legend({'position': 'bottom', 'font' : {'size' : 9}})
+    chart3.set_size({'width': 550, 'height': 376})
+
+    chart4.set_title ({'name': 'Weight Height Distribution', 'name_font':  {'name': 'calibri (corps)', 'size': 13}})
+    chart4.set_x_axis({'name': 'Diameter  (nm)','name_font':  {'name': 'calibri (corps)', 'size': 10,'bold': False},  'num_font' : {'name' : 'calibri (corps)', 'size' : 9}, 'log_base': 10,  'min':10 ,  'major_gridlines': {'visible': True,'line': {'width': 0.6}}, 'minor_gridlines': {'visible': True,'line': {'width': 0.07}}})
+    chart4.set_y_axis({'min' : 0, 'max' : 100})
+    chart4.set_legend({'position': 'bottom', 'font' : {'size' : 9}})
+    chart4.set_size({'width': 550, 'height': 376})
+
+    chart5.set_title ({'name': 'LogW Distribution', 'name_font':  {'name': 'calibri (corps)', 'size': 13}})
+    chart5.set_x_axis({'name': 'Diameter  (nm)','name_font':  {'name': 'calibri (corps)', 'size': 10,'bold': False}, 'num_font' : {'name' : 'calibri (corps)', 'size' : 9},'log_base': 10,  'min':10 ,  'major_gridlines': {'visible': True,'line': {'width': 0.6}}, 'minor_gridlines': {'visible': True,'line': {'width': 0.07}}})
+    chart5.set_y_axis({'min' : 0, 'max' : 100, 'num_font' : {'name' : 'calibri (corps)', 'size' : 9}})
+    chart5.set_legend({'position': 'bottom', 'font' : {'size' : 9}})
+    chart5.set_size({'width': 550, 'height': 376})
+
+    chart6.set_title ({'name': 'Cumulative Weight Distribution', 'name_font':  {'name': 'calibri (corps)', 'size': 13}})
+    chart6.set_x_axis({'name': 'Diameter  (nm)','name_font':  {'name': 'calibri (corps)', 'size': 10,'bold': False},  'num_font' : {'name' : 'calibri (corps)', 'size' : 9}, 'log_base': 10,  'min':10 ,  'major_gridlines': {'visible': True,'line': {'width': 0.6}}, 'minor_gridlines': {'visible': True,'line': {'width': 0.07}}})
+    chart6.set_y_axis({'min' : 0, 'max' : 100})
+    chart6.set_legend({'position': 'bottom', 'font' : {'size' : 9}})
+    chart6.set_size({'width': 550, 'height': 376})
 
     # Insert the chart into the worksheet (with an offset).
-    worksheet_1.insert_chart('K15', chart1, {'x_offset': 0, 'y_offset': 0})
-    worksheet_1.insert_chart('B15', chart2, {'x_offset': 0, 'y_offset': 0})
-    worksheet_1.insert_chart('T15', chart3, {'x_offset': 0, 'y_offset': 0})
+    worksheet_1.insert_chart(row + row_i, col_chart1, chart1, {'x_offset': 0, 'y_offset': 0})
+    worksheet_1.insert_chart(row + row_i, col_chart2, chart2, {'x_offset': 0, 'y_offset': 0})
+    worksheet_1.insert_chart(row + row_i, col_chart3, chart3, {'x_offset': 0, 'y_offset': 0})
+    worksheet_1.insert_chart(row + row_i + 21, col_chart1, chart4, {'x_offset': 0, 'y_offset': 0})
+    worksheet_1.insert_chart(row + row_i + 21, col_chart2, chart5, {'x_offset': 0, 'y_offset': 0})
+    worksheet_1.insert_chart(row + row_i + 21, col_chart3, chart6, {'x_offset': 0, 'y_offset': 0})
 
 
     workbook.close()
@@ -208,7 +272,7 @@ colnames = ['Diameter', 'Time','Empty1' , 'Empty2', 'Weight_Height', 'Weight_Log
 
 Data_all = list()
 
-Parameter = ['D10','D16','D25','D50','D75','D84','D90','Ld','Mode','FWHM','FWHM/Mode']
+Parameter = ['D10 (nm)','D16 (nm)','D25 (nm)','D50 (nm)','D75 (nm)','D84 (nm)','D90 (nm)','Ld','Mode (nm)','FWHM (50%)','FWHM/Mode']
 
 index =[]
 for file in uploaded_files :

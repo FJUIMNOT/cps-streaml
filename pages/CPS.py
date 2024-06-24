@@ -13,12 +13,12 @@ from operator import itemgetter
 from itertools import groupby
 import linecache
 
-@st.cache
+@st.cache_data
 
-def excel_write_col(worksheet,row,col, data):
+def excel_write_col(_worksheet,row,col, data):
     print(len(data))
     for row_count in range (row,len(data)+row):
-        worksheet.write(row_count,col,data[row_count-row])
+        _worksheet.write(row_count,col,data[row_count-row])
 
 def save_raw_excel(result_5, result_079, data,comments_text):
     output = BytesIO()
@@ -165,6 +165,53 @@ def save_raw_excel(result_5, result_079, data,comments_text):
             mydict[f"worksheet_{name}"].autofit()
             col_tabs+=1
         col_d +=5
+            # insert chart in the worksheet{sample name} 
+        
+        for g in range(6) :
+            chart_g = workbook.add_chart({'type': 'scatter', 'subtype': 'smooth'})
+            #chart_g =  mydict[f"worksheet_{name}"].add_chart({'type': 'scatter', 'subtype': 'smooth'})
+            chart_g.set_x_axis({'name': 'Diameter  (nm)','name_font':  {'name': 'calibri (corps)', 'size': 10,'bold': False}, 'num_font' : {'name' : 'calibri (corps)', 'size' : 9}, 'log_base': 10,  'min':10 ,  'major_gridlines': {'visible': True,'line': {'width': 0.6}}, 'minor_gridlines': {'visible': True,'line': {'width': 0.07}}})
+            chart_g.set_y_axis({ 'min' : 0, 'max' : 100})
+            chart_g.set_legend({'position': 'bottom', 'font' : {'size' : 9}})
+            chart_g.set_size({'width': 550, 'height': 376})
+
+            diam_cat_name = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i)}${row_i+1}:${xlsxwriter.utility.xl_col_to_name(col_i)}${len_data}"
+            WH_val_name = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+1)}${row_i+1}:${xlsxwriter.utility.xl_col_to_name(col_i+1)}${len_data}"
+            WLW_val_name = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+2)}${row_i+1}:${xlsxwriter.utility.xl_col_to_name(col_i+2)}${len_data}"
+            WCW_val_name = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+3)}${row_i+1}:${xlsxwriter.utility.xl_col_to_name(col_i+3)}${len_data}"
+            diam_cat_79_name = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i)}${row_79}:${xlsxwriter.utility.xl_col_to_name(col_i)}${len_data}"
+            WH_val_79_name = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+1)}${row_79}:${xlsxwriter.utility.xl_col_to_name(col_i+1)}${len_data}"
+            WLW_val_79_name = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+2)}${row_79}:${xlsxwriter.utility.xl_col_to_name(col_i+2)}${len_data}"
+            WCW_val_79_name = f"={name}!${xlsxwriter.utility.xl_col_to_name(col_i+3)}${row_79}:${xlsxwriter.utility.xl_col_to_name(col_i+3)}${len_data}"
+            
+
+            if g == 0 or g == 3 :
+                chart_g.set_title({'name': 'Weight Height Distribution', 'name_font':  {'name': 'calibri (corps)', 'size': 13}})
+                if g == 0 :
+                    chart_g.add_series({'name': name,'categories':diam_cat_name,'values': WH_val_name,'line': {'width': 1.25}})
+                    mydict[f"worksheet_{name}"].insert_chart(10, col_chart1 - 2, chart_g, {'x_offset': 0, 'y_offset': 0})
+                elif g == 3 :
+                    chart_g.add_series({'name': name,'categories':diam_cat_79_name ,'values': WH_val_79_name,'line': {'width': 1.25}})
+                    mydict[f"worksheet_{name}"].insert_chart(30, col_chart1 - 2, chart_g, {'x_offset': 0, 'y_offset': 0})
+
+            if g == 1 or g == 4: 
+                chart_g.set_title({'name': 'LogW Distribution', 'name_font':  {'name': 'calibri (corps)', 'size': 13}})
+                if g == 1 :
+                    chart_g.add_series({'name': name,'categories':diam_cat_name ,'values': WLW_val_name  , 'line': {'width': 1.25}})
+                    mydict[f"worksheet_{name}"].insert_chart(10, col_chart2 -7, chart_g, {'x_offset': 0, 'y_offset': 0})
+                elif g == 4:
+                    chart_g.add_series({'name': name,'categories':diam_cat_79_name ,'values': WLW_val_79_name, 'line': {'width': 1.25}})
+                    mydict[f"worksheet_{name}"].insert_chart(30, col_chart2 -7, chart_g, {'x_offset': 0, 'y_offset': 0})
+
+            if g == 2 or g == 5 :
+                chart_g.set_title ({'name': 'Cumulative Weight Distribution', 'name_font':  {'name': 'calibri (corps)', 'size': 13}})
+                if g == 2 :
+                    chart_g.add_series({'name': name,'categories':diam_cat_name ,'values': WCW_val_name, 'line': {'width': 1.25}})
+                    mydict[f"worksheet_{name}"].insert_chart(10, col_chart3, chart_g, {'x_offset': 0, 'y_offset': 0})
+                elif g == 5 :
+                    chart_g.add_series({'name': name,'categories':diam_cat_79_name ,'values': WCW_val_79_name, 'line': {'width': 1.25}})
+                    mydict[f"worksheet_{name}"].insert_chart(30, col_chart3, chart_g, {'x_offset': 0, 'y_offset': 0})
+            
     row +=1
 
     # Add a chart title and some axis labels.
@@ -262,8 +309,8 @@ def CSP_parameters(data):
 
 
 ######### Main  #########
-st.set_page_config(layout="wide", page_title="Du coté de chez Swan")
-st.sidebar.title('Swan - CPS')
+st.set_page_config(layout="wide", page_title="Du coté de l'analyse")
+st.sidebar.title('CPS')
 st.sidebar.write("Preparation des **données CPS** et calcul des parametres pour la methode 5microns et 0.79 microns. Le programme accepte en entrée les fichiers natifs csv.")
 
 

@@ -142,12 +142,12 @@ def write_multiple_dfs_to_xlsx(data_frames):
     return output
 
 #######################
-# Streamlit app layout
+# Streamlit app layout #
 #######################
 
-st.title("Upload XLS Files and Combine First Sheets into One XLSX")
+st.title("Sedigraph")
 
-uploaded_files = st.file_uploader("Upload XLS files", type=["xls", "xlsx"], accept_multiple_files=True)
+uploaded_files = st.file_uploader("Upload files : ", type=["xls", "xlsx"], accept_multiple_files=True)
 
 if uploaded_files:
     data_frames = []
@@ -165,7 +165,7 @@ if uploaded_files:
         output = write_multiple_dfs_to_xlsx(data_frames)
 
         # Provide a download link for the new XLSX file
-        st.download_button(label="Download combined XLSX file",
+        st.download_button(label="Download XLSX file",
                            data=output,
                            file_name="Sedigraph.xlsx",
                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")

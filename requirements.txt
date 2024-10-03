@@ -7,4 +7,3 @@ plotly
 xlsxwriter
 scipy
 xlrd>=2.0.1
-

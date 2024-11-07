@@ -364,7 +364,7 @@ if uploaded_files :
 
     #Print results
 
-    comments_text = st.text_area("Description echantillon", height=4 )
+    comments_text = st.text_area("Description echantillon", height=68 )
 
     with st.container() :
         st.write('Methode 5 microns')
